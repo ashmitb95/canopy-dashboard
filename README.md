@@ -2,9 +2,9 @@
 
 **A switch-first dashboard for multi-repo workspaces. One canonical feature in focus, the rest hibernating in worktrees, every PR / preflight / draft reply one click away.**
 
-Canopy coordinates real Git branches and worktrees across multiple repositories — no proprietary abstractions, no virtual branches. This extension is a VSCode-native surface on top of the [Canopy CLI](https://github.com/ashmitb95/canopy); the same JSON contract the CLI ships. What the dashboard shows is exactly what `canopy state` / `canopy triage` / `canopy feature status` would show in a terminal.
+Canopy coordinates real Git branches and worktrees across multiple repositories — no proprietary abstractions, no virtual branches. This extension is a VSCode-native surface on top of the [`canopy-cli`](https://github.com/ashmitb95/canopy) backend (CLI + MCP server, published to PyPI). The dashboard reads the same JSON contract the CLI ships — what you see here is what `canopy state` / `canopy triage` / `canopy feature status` would show in a terminal.
 
-![Global dashboard](https://raw.githubusercontent.com/ashmitb95/canopy/main/vscode-extension/media/screenshots/dashboard-global.png)
+![Global dashboard](https://raw.githubusercontent.com/ashmitb95/canopy-dashboard/main/media/screenshots/dashboard-global.png)
 
 ---
 
@@ -14,7 +14,7 @@ Canopy coordinates real Git branches and worktrees across multiple repositories 
 
 Global mode is the focus board. Three vertical lanes mirror Canopy's canonical-slot model: the **canonical** feature (what's currently in your main checkout), **warm** features (linked worktrees, instantly switchable), and **cold** features (branch-only, switching creates a worktree on demand). A right-hand triage rail surfaces the priority list across every PR — changes-requested, bot reviews, review-required, approved.
 
-![Feature dashboard](https://raw.githubusercontent.com/ashmitb95/canopy/main/vscode-extension/media/screenshots/dashboard-feature.png)
+![Feature dashboard](https://raw.githubusercontent.com/ashmitb95/canopy-dashboard/main/media/screenshots/dashboard-feature.png)
 
 Click any feature to drill in. The feature view stacks: linked Linear/GitHub issue body → per-repo cards with branch + target + dirty + PR + actionable threads + CI chips → temporally classified review threads grouped by repo (each with **Address in agent** / **Reply** / **Mark addressed** for bot threads) → unified-diff stack with click-to-open in VSCode's native diff viewer. The right rail is the action drawer: Priority list of actionable threads, Checks (preflight + cross-feature conflicts + worktree bootstrap), Commit & push (per-repo Stage / Commit / Push / Open PR + the **Ship feature** capstone + draft-replies generator), State (stash / pop / back to global), Open (IDE / issue / PRs).
 
@@ -34,11 +34,17 @@ Three sections: **ACTIVE** (canonical feature, expandable per-repo), **LAUNCHERS
 
 ## Install
 
-1. Install the extension from the VSCode Marketplace (or `code --install-extension canopy-x.y.z.vsix` for a local build).
-2. Open a folder containing a `canopy.toml`. The first time you click the activity-bar canopy icon the dashboard auto-opens; this is per-user, not per-workspace.
-3. If the sidebar offers **Install Canopy for me**, click it — the extension sets up a managed venv at `~/.canopy-vscode/venv` and installs the Canopy backend. Otherwise `pipx install canopy` from a terminal works.
+1. **Install the backend.** The dashboard shells out to the `canopy` CLI and `canopy-mcp` server:
+   ```bash
+   pipx install canopy-cli
+   ```
+   (See [canopy-cli on PyPI](https://pypi.org/project/canopy-cli/).)
+2. **Install the extension** from the VSCode Marketplace (or `code --install-extension canopy-x.y.z.vsix` for a local build).
+3. **Open a folder containing a `canopy.toml`.** The first time you click the activity-bar canopy icon the dashboard auto-opens.
 
-The extension shells out to two binaries: `canopy` (the CLI) for the dashboard, and `canopy-mcp` (the MCP server) for the legacy panels + status bar. Both are auto-discovered via login-shell PATH; absolute paths in settings override.
+If the CLI isn't on your PATH on first activation, the extension surfaces an **Install Canopy CLI** action in the welcome view and palette — clicking it runs `pipx install canopy-cli` in an integrated terminal for you.
+
+Both `canopy` and `canopy-mcp` are auto-discovered via login-shell PATH; absolute paths in settings override.
 
 ---
 
@@ -75,8 +81,9 @@ The action drawer in feature view exposes: **Run preflight**, **Cross-feature co
 
 ## Links
 
-- **[Canopy on GitHub](https://github.com/ashmitb95/canopy)** — CLI, MCP server, full architecture docs
+- **[canopy-cli on PyPI](https://pypi.org/project/canopy-cli/)** — the Python backend the extension shells out to
+- **[ashmitb95/canopy](https://github.com/ashmitb95/canopy)** — CLI + MCP server source, full architecture docs
 - **[Changelog](CHANGELOG.md)**
-- **[Report a bug](https://github.com/ashmitb95/canopy/issues)**
+- **[Report a bug](https://github.com/ashmitb95/canopy-dashboard/issues)** — extension bugs (CLI/MCP bugs → the canopy repo)
 
 MIT licensed.
