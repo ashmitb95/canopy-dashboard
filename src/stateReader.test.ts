@@ -70,17 +70,17 @@ describe("StateReader — JSON state files", () => {
   it("features parses real entries (per-repo branches map preserved)", () => {
     mockReads({
       "features.json": JSON.stringify({
-        "doc-1003": {
+        "auth-flow": {
           repos: ["api", "ui"],
           status: "active",
-          branches: { api: "doc-1003-fixes", ui: "DOC-1003-fixes-v2" },
+          branches: { api: "auth-flow", ui: "auth-flow-v2" },
         },
       }),
     });
     const f = new StateReader("/ws").features();
-    expect(f["doc-1003"].branches).toEqual({
-      api: "doc-1003-fixes",
-      ui: "DOC-1003-fixes-v2",
+    expect(f["auth-flow"].branches).toEqual({
+      api: "auth-flow",
+      ui: "auth-flow-v2",
     });
   });
 });
