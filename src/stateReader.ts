@@ -27,6 +27,7 @@ import * as path from "node:path";
 
 export type StateKey =
   | "active_feature"
+  | "slots"
   | "heads"
   | "preflight"
   | "features"
@@ -36,6 +37,24 @@ export interface ActiveFeature {
   feature: string | null;
   per_repo_paths?: Record<string, string>;
   activated_at?: string;
+  last_touched?: Record<string, string>;
+}
+
+/**
+ * Shape of `.canopy/state/slots.json` — canopy 3.0+ source of truth for
+ * canonical + warm-slot occupancy. Pre-3.0 workspaces used
+ * `active_feature.json` instead; `activeFeature()` falls back to either.
+ */
+export interface SlotsState {
+  version: number;
+  slot_count: number;
+  previous_canonical?: string | null;
+  canonical?: {
+    feature: string | null;
+    activated_at?: string;
+    per_repo_paths?: Record<string, string>;
+  } | null;
+  slots: Record<string, { feature: string; occupied_at?: string } | null>;
   last_touched?: Record<string, string>;
 }
 
@@ -92,9 +111,43 @@ export class StateReader {
     private readonly ttlMs: number = DEFAULT_TTL_MS,
   ) {}
 
-  /** Read `.canopy/state/active_feature.json`. `null` when no canonical feature. */
+  /**
+   * Canonical-feature info. Reads `.canopy/state/slots.json` (canopy 3.0+);
+   * falls back to the legacy `active_feature.json` when slots.json is
+   * missing (pre-3.0 workspaces). Returns `null` when neither file exists
+   * or neither has a canonical feature set.
+   */
   activeFeature(): ActiveFeature | null {
+    const slots = this.slots();
+    if (slots?.canonical?.feature) {
+      return {
+        feature: slots.canonical.feature,
+        per_repo_paths: slots.canonical.per_repo_paths,
+        activated_at: slots.canonical.activated_at,
+        last_touched: slots.last_touched,
+      };
+    }
     return this.readJson("active_feature", ".canopy/state/active_feature.json");
+  }
+
+  /** Read `.canopy/state/slots.json` (canopy 3.0+ slot model). `null` pre-3.0. */
+  slots(): SlotsState | null {
+    return this.readJson("slots", ".canopy/state/slots.json");
+  }
+
+  /**
+   * Feature names currently occupying warm slots. Empty array pre-3.0
+   * (slots.json absent) — caller should fall back to inspecting
+   * features.json entries' `worktree_paths`/`use_worktrees` in that case.
+   */
+  warmFeatures(): string[] {
+    const s = this.slots();
+    if (!s) return [];
+    const names: string[] = [];
+    for (const occupant of Object.values(s.slots)) {
+      if (occupant?.feature) names.push(occupant.feature);
+    }
+    return names;
   }
 
   /** Read `.canopy/state/heads.json`. Map of repo → {branch, sha}. */

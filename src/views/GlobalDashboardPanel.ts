@@ -547,12 +547,19 @@ export class GlobalDashboardPanel {
       // (Earlier refactor accidentally left these arrays empty, which
       // is why warm/cold sections rendered "no warm worktrees" + "no
       // cold branches" even though features.json had 5 entries.)
+      // canopy 3.0+: warm-slot occupancy lives in slots.json (not in
+      // features.json entries' worktree_paths/use_worktrees, which are
+      // legacy). Use stateReader.warmFeatures() as the source of truth,
+      // falling back to the legacy fields if slots.json isn't present
+      // yet (pre-migration workspaces).
+      const warmSet = new Set(this.state.warmFeatures());
       const warm: string[] = [];
       const cold: string[] = [];
       for (const [name, entry] of Object.entries(entries)) {
         if (name === canonicalFeature) continue;
         if (entry.status && entry.status !== "active") continue;
         const hasWorktree =
+          warmSet.has(name) ||
           Boolean(entry.use_worktrees) ||
           Boolean(entry.worktree_paths && Object.keys(entry.worktree_paths).length);
         (hasWorktree ? warm : cold).push(name);

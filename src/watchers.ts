@@ -17,7 +17,7 @@ interface WatcherCallbacks {
  *
  *   1. `.canopy/features.json`            (300ms) → tree views + cockpit
  *   2. `.canopy/worktrees/**\/.git/{HEAD,index}` (500ms) → Changes view
- *   3. `.canopy/state/{active_feature,heads,preflight}.json` (200ms) → cockpit
+ *   3. `.canopy/state/{active_feature,slots,heads,preflight}.json` (200ms) → cockpit
  *
  * State-file changes get the tightest debounce since the cockpit's
  * "what's canonical" + "is preflight stale" displays are user-facing
@@ -54,7 +54,7 @@ export function createWatchers(
   if (cb.onStateFilesChanged) {
     const statePattern = new vscode.RelativePattern(
       workspaceRoot,
-      ".canopy/state/{active_feature,heads,preflight}.json",
+      ".canopy/state/{active_feature,slots,heads,preflight}.json",
     );
     const stateWatcher = vscode.workspace.createFileSystemWatcher(statePattern);
     const fireState = debounce(cb.onStateFilesChanged, 200);

@@ -104,11 +104,12 @@ describe("StateReader — caching", () => {
     const r = new StateReader("/ws", 60_000);
     r.heads();
     r.activeFeature();
-    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(2);
+    // heads.json + slots.json (miss, cached as null) + active_feature.json fallback = 3
+    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(3);
     r.invalidate("heads");
     r.heads();        // re-read
-    r.activeFeature(); // still cached
-    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(3);
+    r.activeFeature(); // still cached (both slots and active_feature)
+    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(4);
   });
 
   it("invalidateAll() drops every cached entry", () => {
@@ -122,7 +123,8 @@ describe("StateReader — caching", () => {
     r.invalidateAll();
     r.heads();
     r.activeFeature();
-    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(4);
+    // 2 rounds × (heads + slots-miss + active_feature) = 6
+    expect(mockedFs.readFileSync).toHaveBeenCalledTimes(6);
   });
 });
 

@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.7.6
+
+- **Fix: dashboard reads canopy 3.0+ slots.json for canonical + warm-slot occupancy.** Pre-3.0 the source-of-truth was `.canopy/state/active_feature.json`; in canopy 3.0 it moved to `.canopy/state/slots.json` (with `canonical.feature` + `slots[worktree-N].feature`). The stateReader was still pointed at the deleted file, so the dashboard rendered "no canonical feature" and "no warm worktrees" even on a fully-set-up workspace. `stateReader.activeFeature()` now reads slots.json first, falls back to the legacy file for pre-3.0 workspaces. New `stateReader.slots()` + `stateReader.warmFeatures()` helpers. File-system watcher picks up slots.json changes (200ms debounce).
+- Global dashboard's warm/cold partition now uses `stateReader.warmFeatures()` (slot occupants) instead of `features.json` entries' `worktree_paths`/`use_worktrees` (legacy fields, not populated in 3.0+).
+
 ## 0.7.5
 
 - Fix: `cliResolver` now does a sibling-project scan (`~/projects/*/.venv/bin/canopy`, plus `~/src/`, `~/code/`, `~/Developer/`, `~/dev/`, `~/workspace/`) just like `mcpResolver` already does. Without this, users with `canopy-mcp` resolvable via sibling scan but `canopy` only on a shell alias got a half-working dashboard: MCP up, CLI unresolved, dashboard panel empty. Both transports now use the same fallback ladder.
