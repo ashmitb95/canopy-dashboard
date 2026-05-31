@@ -1,14 +1,14 @@
 {
   "name": "canopy",
   "displayName": "Canopy — Multi-Repo Worktree Manager",
-  "description": "Worktree-first workspace manager for multi-repo development. Features, worktrees, per-repo changes, and review readiness in one sidebar.",
+  "description": "Switch-first dashboard for multi-repo workspaces. One canonical feature in focus, the rest hibernating in worktrees — every PR, preflight, and draft reply one click away.",
   "version": "0.7.1",
   "publisher": "SingularityInc",
   "license": "MIT",
   "icon": "media/canopy-icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ashmitb95/canopy.git"
+    "url": "https://github.com/ashmitb95/canopy-dashboard.git"
   },
   "engines": {
     "vscode": "^1.85.0"
