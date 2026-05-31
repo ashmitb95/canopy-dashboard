@@ -35,6 +35,7 @@ export interface CliResolution {
     | "settings"
     | "login-shell"
     | "disk-scan"
+    | "sibling-project-scan"
     | "unresolved";
   /** Paths tried, in order. Useful for the "couldn't find canopy" error. */
   tried: string[];
@@ -74,9 +75,47 @@ export function resolveCanopyCli(
     }
   }
 
-  // 4. Give up. Caller surfaces the ENOENT with `tried` so the user can see
+  // 4. Sibling project scan — walk common dev-project parents and pick up
+  //    `<parent>/<repo>/.venv/bin/canopy` from any nearby canopy checkout.
+  //    Mirrors the same fallback in mcpResolver; without it, a user with
+  //    `canopy-mcp` resolvable via sibling scan but `canopy` only on a
+  //    login-shell alias gets a half-working dashboard (MCP up, CLI dead).
+  const sibling = siblingProjectScan(configuredPath);
+  if (sibling) {
+    tried.push(sibling);
+    return { path: sibling, resolvedVia: "sibling-project-scan", tried };
+  }
+
+  // 5. Give up. Caller surfaces the ENOENT with `tried` so the user can see
   //    where we looked.
   return { path: configuredPath, resolvedVia: "unresolved", tried };
+}
+
+function siblingProjectScan(binaryName: string): string | null {
+  const name = binaryName.includes("/") ? path.basename(binaryName) : binaryName;
+  const home = os.homedir();
+  const parents = [
+    path.join(home, "projects"),
+    path.join(home, "src"),
+    path.join(home, "code"),
+    path.join(home, "Developer"),
+    path.join(home, "dev"),
+    path.join(home, "workspace"),
+  ];
+  for (const parent of parents) {
+    if (!fs.existsSync(parent)) continue;
+    let children: string[];
+    try {
+      children = fs.readdirSync(parent);
+    } catch {
+      continue;
+    }
+    for (const child of children) {
+      const candidate = path.join(parent, child, ".venv", "bin", name);
+      if (fs.existsSync(candidate)) return candidate;
+    }
+  }
+  return null;
 }
 
 function resolveViaLoginShell(binary: string): string | null {

@@ -2,7 +2,7 @@
   "name": "canopy",
   "displayName": "Canopy — Multi-Repo Worktree Manager",
   "description": "Switch-first dashboard for multi-repo workspaces. One canonical feature in focus, the rest hibernating in worktrees — every PR, preflight, and draft reply one click away.",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "publisher": "SingularityInc",
   "license": "MIT",
   "icon": "media/canopy-icon.png",

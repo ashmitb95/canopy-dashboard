@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.5
+
+- Fix: `cliResolver` now does a sibling-project scan (`~/projects/*/.venv/bin/canopy`, plus `~/src/`, `~/code/`, `~/Developer/`, `~/dev/`, `~/workspace/`) just like `mcpResolver` already does. Without this, users with `canopy-mcp` resolvable via sibling scan but `canopy` only on a shell alias got a half-working dashboard: MCP up, CLI unresolved, dashboard panel empty. Both transports now use the same fallback ladder.
+
 ## 0.7.4
 
 - Fix: bump expected `canopy-mcp` version from `0.1.0` (stale, last seen in early-canopy days) to `3.1.1` so the version handshake toast doesn't fire on every new install. Still tracks `src/canopy/__init__.py` and needs a manual bump per canopy-cli release — drop-or-replace with a schema-version-only check is a follow-up.
