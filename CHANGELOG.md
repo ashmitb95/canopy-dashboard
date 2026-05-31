@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.7.2
+
+- First release from the standalone [canopy-dashboard](https://github.com/ashmitb95/canopy-dashboard) repo (extracted from the canopy monorepo).
+- New **Canopy: Install CLI** palette command + welcome-view button. Runs `pipx install canopy-cli && canopy setup-agent` in an integrated terminal, with a pre-check for pipx and a managed-venv fallback.
+- `cliResolver` disk-scan now includes `~/.local/pipx/venvs/canopy-cli/bin/<name>` (matches the actual pipx venv created by `pipx install canopy-cli`); legacy `…/venvs/canopy/…` kept as a fallback.
+- Repository URL + description updated for the new repo and the agent-first framing.
+- `.vscodeignore`: exclude `.github/**` from the packaged VSIX.
+
 ## 0.7.1
 
 - README points at the new dashboard screenshots via absolute
