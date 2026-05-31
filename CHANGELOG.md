@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.3
+
+- Fix: clicking the title-bar refresh icon while `canopy-mcp` isn't connected (e.g., right after installing canopy via the new pipx flow but before reloading the window) no longer errors with `command 'canopy.refresh' not found`. Pre-MCP the refresh icon now routes to `Canopy: Retry Connect`; once connected, registerCommands swaps in the real status+tree refresh. Same command, behavior depends on connection state.
+
 ## 0.7.2
 
 - First release from the standalone [canopy-dashboard](https://github.com/ashmitb95/canopy-dashboard) repo (extracted from the canopy monorepo).

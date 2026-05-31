@@ -95,12 +95,22 @@ async function bootstrap(
   const client = new CanopyClient(resolved.path, root.uri.fsPath, output);
   context.subscriptions.push({ dispose: () => void client.dispose() });
 
+  // Mutable holder for canopy.refresh's behavior. Pre-MCP it routes to
+  // retryConnect so the title-bar refresh icon doubles as "try reconnecting
+  // after I just installed canopy". Once registerCommands runs (post-MCP),
+  // it overwrites holder.fn with the real status+tree refresh.
+  const refreshHolder: { fn: () => Promise<void> } = {
+    fn: async () => {
+      await vscode.commands.executeCommand("canopy.retryConnect");
+    },
+  };
+
   // ── 1. Always-available diagnostics — registered BEFORE the MCP probe
   // so they survive a connection failure. Without this the user gets a
   // tree view that says "no data provider registered" + no Canopy
   // commands in the palette, which is a dead end for anyone whose
   // `canopy-mcp` isn't on PATH (the common new-user failure mode).
-  registerDiagnosticCommands(context, output, root, client);
+  registerDiagnosticCommands(context, output, root, client, refreshHolder);
 
   // ── 2. Stub the tree views so the `viewsWelcome` content (with
   // "Install Canopy for me" / "Set Path" / "Retry" / "Show Log"
@@ -227,6 +237,7 @@ async function bootstrap(
     },
   };
 
+  refreshHolder.fn = refresh;
   registerCommands(context, client, refresh);
   registerGlobalDashboardCommand(context, root.uri, cli, stateReader, output);
   await maybeAutoOpenGlobalDashboard(context);
@@ -422,8 +433,10 @@ function registerDiagnosticCommands(
   output: vscode.OutputChannel,
   root: vscode.WorkspaceFolder,
   client: CanopyClient,
+  refreshHolder: { fn: () => Promise<void> },
 ): void {
   context.subscriptions.push(
+    vscode.commands.registerCommand("canopy.refresh", () => refreshHolder.fn()),
     vscode.commands.registerCommand("canopy.showLog", () => output.show()),
     vscode.commands.registerCommand("canopy.retryConnect", async () => {
       output.appendLine("[canopy] retrying MCP connection");
@@ -525,9 +538,10 @@ function registerCommands(
   client: CanopyClient,
   refresh: () => Promise<void>,
 ): void {
+  // canopy.refresh is registered in registerDiagnosticCommands (which runs
+  // pre-MCP); the activate body overwrites refreshHolder.fn with the real
+  // refresh just before reaching this point.
   context.subscriptions.push(
-    vscode.commands.registerCommand("canopy.refresh", () => void refresh()),
-
     vscode.commands.registerCommand("canopy.createFeature", async () => {
       const created = await runCreateFeature(client);
       if (created) {
