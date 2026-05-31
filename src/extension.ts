@@ -8,6 +8,7 @@ import { resolveCanopyCli } from "./cliResolver";
 import { runCreateFeature } from "./commands/createFeature";
 import { runCreateFeatureFromIssue } from "./commands/createFeatureFromIssue";
 import { runInstallBackend } from "./commands/installBackend";
+import { runInstallCli } from "./commands/installCli";
 import { runSetupWizard } from "./commands/setupWizard";
 import { StateReader } from "./stateReader";
 import { LinearIssue } from "./types";
@@ -130,11 +131,14 @@ async function bootstrap(
     output.show(true);
     const pick = await vscode.window.showErrorMessage(
       `Canopy: could not start canopy-mcp (tried ${resolved.path}).`,
+      "Install via pipx",
       "Install Canopy for me",
       "Open Settings",
       "Show Log",
     );
-    if (pick === "Install Canopy for me") {
+    if (pick === "Install via pipx") {
+      await vscode.commands.executeCommand("canopy.installCli");
+    } else if (pick === "Install Canopy for me") {
       await vscode.commands.executeCommand("canopy.installBackend");
     } else if (pick === "Open Settings") {
       void vscode.commands.executeCommand(
@@ -460,6 +464,9 @@ function registerDiagnosticCommands(
       if (installed) {
         await vscode.commands.executeCommand("canopy.retryConnect");
       }
+    }),
+    vscode.commands.registerCommand("canopy.installCli", async () => {
+      await runInstallCli();
     }),
     vscode.commands.registerCommand("canopy.runDoctor", async () => {
       output.show();

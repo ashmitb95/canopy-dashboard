@@ -59,7 +59,7 @@
       {
         "view": "canopy.tree",
         "when": "canopy.state == 'no-mcp'",
-        "contents": "Canopy detected a workspace, but can't start `canopy-mcp`.\n\n[Install Canopy for me](command:canopy.installBackend)\n\nOr wire up an existing install:\n\n[Set canopy-mcp Path](command:workbench.action.openSettings?%22canopy.canopyMcpPath%22)\n\n[Retry](command:canopy.retryConnect)\n\n[Show Log](command:canopy.showLog)"
+        "contents": "Canopy detected a workspace, but can't start `canopy-mcp`.\n\n[Install CLI via pipx](command:canopy.installCli)\n\nOr use the managed-venv fallback:\n\n[Install Canopy for me](command:canopy.installBackend)\n\nOr wire up an existing install:\n\n[Set canopy-mcp Path](command:workbench.action.openSettings?%22canopy.canopyMcpPath%22)\n\n[Retry](command:canopy.retryConnect)\n\n[Show Log](command:canopy.showLog)"
       },
       {
         "view": "canopy.tree",
@@ -128,6 +128,10 @@
       {
         "command": "canopy.showLog",
         "title": "Canopy: Show Log"
+      },
+      {
+        "command": "canopy.installCli",
+        "title": "Canopy: Install CLI (pipx, recommended)"
       },
       {
         "command": "canopy.installBackend",

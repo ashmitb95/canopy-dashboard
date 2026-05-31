@@ -119,6 +119,10 @@ function diskCandidates(
   // Per-user install locations.
   candidates.push(
     path.join(home, ".local", "bin", name),
+    // pipx venv directory is named after the PyPI distribution (canopy-cli),
+    // not the executable. Keep the legacy `canopy` path as a fallback for
+    // anyone still on the pre-PyPI editable install.
+    path.join(home, ".local", "pipx", "venvs", "canopy-cli", "bin", name),
     path.join(home, ".local", "pipx", "venvs", "canopy", "bin", name),
     path.join(home, ".canopy-vscode", "venv", "bin", name),
   );
