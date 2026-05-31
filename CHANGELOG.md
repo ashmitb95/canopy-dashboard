@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.4
+
+- Fix: bump expected `canopy-mcp` version from `0.1.0` (stale, last seen in early-canopy days) to `3.1.1` so the version handshake toast doesn't fire on every new install. Still tracks `src/canopy/__init__.py` and needs a manual bump per canopy-cli release — drop-or-replace with a schema-version-only check is a follow-up.
+
 ## 0.7.3
 
 - Fix: clicking the title-bar refresh icon while `canopy-mcp` isn't connected (e.g., right after installing canopy via the new pipx flow but before reloading the window) no longer errors with `command 'canopy.refresh' not found`. Pre-MCP the refresh icon now routes to `Canopy: Retry Connect`; once connected, registerCommands swaps in the real status+tree refresh. Same command, behavior depends on connection state.

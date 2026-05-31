@@ -99,7 +99,7 @@ export class CanopyClient {
         mcp_version: string;
         schema_version: string;
       }>("version");
-      const expected = "0.1.0";   // tracks src/canopy/__init__.py
+      const expected = "3.1.1";   // tracks src/canopy/__init__.py — bump in lockstep with canopy-cli releases
       this.outputChannel.appendLine(
         `[canopy] version: cli=${v.cli_version || "?"} mcp=${v.mcp_version || "?"} schema=${v.schema_version || "?"} (extension expects ${expected})`,
       );
